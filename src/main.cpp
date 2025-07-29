@@ -7,13 +7,15 @@
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // motor groups
-pros::MotorGroup leftMotors({-11, -14},
-                            pros::MotorGearset::green); // left motor group - ports 3 (reversed), 4, 5 (reversed)
+pros::MotorGroup leftMotors({-11, -14},pros::MotorGearset::green); // left motor group - ports 3 (reversed), 4, 5 (reversed)
 pros::MotorGroup rightMotors({12, 13}, pros::MotorGearset::green); // right motor group - ports 6, 7, 9 (reversed)
 
 pros::MotorGroup rollers ({21,10}, pros::MotorGearset::green);
+
 pros::Motor motor(15, pros::MotorGearset::green);
+
 pros::adi::DigitalOut piston('C');
+
 pros::adi::DigitalIn limit('F');
 
 // Inertial Sensor on port 10
@@ -185,62 +187,6 @@ void autonomous() {
 }
 */    
 
-    /*
-void autonomous() {
-    pros::lcd::print(3, "Starting autonomous...");
-
-    // Mientras el chasis sigue el path, mostramos posición en el control
-    pros::Task displayTask([]() {
-        while (true) {
-            auto pose = chassis.getPose();
-            controller.print(0, 0, "X: %.2f", pose.x);
-            controller.print(1, 0, "Y: %.2f", pose.y);
-            controller.print(2, 0, "Theta: %.2f", pose.theta);
-            pros::delay(100);
-        }
-    });
-    
-    // Seguir el path generado en path_jerryioo.txt con lookahead 15 y timeout 4000ms
-    chassis.follow(path_jerryioo_txt, 15, 10000, false);
-
-    // Esperar hasta que haya recorrido 10 pulgadas del path
-    chassis.waitUntil(10);
-    pros::lcd::print(4, "Recorrió 10 pulgadas!");
-
-    // Esperar hasta que termine todo el movimiento
-    chassis.waitUntilDone();
-    pros::lcd::print(5, "Ruta terminada!");
-}
-*/
-
-
-
-//Este anda a la perfeccion
-
-/*
-void autonomous() {
-    pros::lcd::print(3, "Starting autonomous...");
-
-    chassis.setPose(62.877, -23.617, 270);
-
-    
-    // Seguir el path generado en path_jerryioo.txt con lookahead 15 y timeout 4000ms
-    chassis.follow(pathrue_txt, 15, 20000, true);
-
-    // Esperar hasta que haya recorrido 10 pulgadas del path
-   // chassis.waitUntil(10);
-   // pros::lcd::print(4, "Recorrió 10 pulgadas!");
-
-    // Esperar hasta que termine todo el movimiento
-    //chassis.waitUntilDone();
-    //pros::lcd::print(5, "Ruta terminada!");
-
-    //pros::delay(150);
-}
-
-*/
-
-
 
 void autonomous() {
     pros::lcd::print(3, "Starting autonomous...");
@@ -262,93 +208,6 @@ void autonomous() {
     //pros::delay(150);
 }
 
-
-
-
-
-/*
-void autonomous() {
-    pros::lcd::print(3, "Starting autonomous...");
-
-    chassis.setPose(63.915, -22.96, 270);
-
-    chassis.follow(decoder["ecoder1"], 15, 6000);
-    chassis.follow(decoder["ecoder2"], 15, 6000);
-    piston.set_value(true);
-    chassis.follow(decoder["ecoder3"], 15, 6000);
-
-
-
-
-
-    // Esperar hasta que haya recorrido 10 pulgadas del path
-   // chassis.waitUntil(10);
-   // pros::lcd::print(4, "Recorrió 10 pulgadas!");
-
-    // Esperar hasta que termine todo el movimiento
-    //chassis.waitUntilDone();
-    //pros::lcd::print(5, "Ruta terminada!");
-
-    //pros::delay(150);
-}
-
-*/
-
-
-/*
-void autonomous() {
-    pros::lcd::print(3, "Starting autonomous...");
-
-    chassis.setPose(0, 0, 0);
-
-    chassis.moveToPose(0, 96.003, 0, 8000);
-
-    chassis.turnToHeading(90, 2000);
-
-    chassis.moveToPose(45, 96.003, 90, 8000);
-
-    chassis.turnToHeading(180, 2000);
-
-    chassis.moveToPose(45, 24, 180, 8000);
-
-    chassis.turnToHeading(270, 2000);
-
-    chassis.moveToPose(0, 24, 270, 8000);
-
-    chassis.turnToHeading(0, 2000);
-
-    chassis.moveToPose(0, 0, 0, 8000, {
-        .forwards = false,
-        .maxSpeed = 127,
-        .minSpeed = 60
-    });
-
-
-
-
-
-
-
-
-    //chassis.moveToPose(25.876, -29.33, 270,8000);
-
-    //chassis.turnToHeading(0, 2000);
-
-    //chassis.moveToPose(25.876, 66.673, 0,8000);
-
-
-
-    //chassis.follow(path_jerry4_txt, 8, 20000, true);
-
-    
-    pros::delay(150);
-}
-
-*/
-
-/**
- * Runs in driver control
- */
 void opcontrol() {
     bool pistonState = false;
     // controller
@@ -371,21 +230,21 @@ void opcontrol() {
             rollers.brake(); // detener rollers si no se presiona nada
         }
             // Control del pistón
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
             piston.set_value(true); // extender
-        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
             piston.set_value(false); // retraer 
         }
 
             // Control del motor suelto
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
             motor.move(127);
-        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
+        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
             motor.move(-127);
         } else {
             motor.brake();
         }
-        // delay to save resources
+        // delay to save resources  
         pros::delay(25);
     }
 }
