@@ -1,25 +1,29 @@
 #include "main.h"
-#include "lemlib/api.hpp" // IWYU pragma: keep
-//#include "lemlib-tarball/api.hpp"
+#include "lemlib/api.hpp"
 
 
-// controller
+// Control
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-// motor groups
-pros::MotorGroup leftMotors({-11, -14},pros::MotorGearset::green); // left motor group - ports 3 (reversed), 4, 5 (reversed)
-pros::MotorGroup rightMotors({12, 13}, pros::MotorGearset::green); // right motor group - ports 6, 7, 9 (reversed)
+// Grupo de motores chassis
+pros::MotorGroup leftMotors({-11, -14},pros::MotorGearset::green); // Grupo de motores izquierdo - puerto 11 (reversa), 14(reversa)
+pros::MotorGroup rightMotors({12, 13}, pros::MotorGearset::green); // Grupo de motores derecgos - puerto 12 y 13
 
-pros::MotorGroup rollers ({21,10}, pros::MotorGearset::green);
 
-pros::Motor motor(15, pros::MotorGearset::green);
+pros::MotorGroup arm ({9,10}, pros::MotorGearset::red); // Grupo de motores para el brazo puerto 9 y 10
 
-pros::adi::DigitalOut piston('C');
+pros::Motor roller(15, pros::MotorGearset::green); // Ruedas de gomas puerto 15
 
-pros::adi::DigitalIn limit('F');
+pros::adi::DigitalOut piston('C');   // Piston puerto "C"
 
-// Inertial Sensor on port 10
-pros::Imu imu(18);
+pros::adi::DigitalIn limit('F');    // Limit switch puerto "F"
+
+//Sensor inercial
+pros::Imu imu(18);  //Puerto 18
+
+
+// Esto no usamos por el momento pero es para usar los tracking wheels
+
 
 // tracking wheels
 // horizontal tracking wheel encoder. Rotation sensor, port 20, not reversed
@@ -31,72 +35,71 @@ pros::Imu imu(18);
 // vertical tracking wheel. 2.75" diameter, 2.5" offset, left of the robot (negative)
 //lemlib::TrackingWheel vertical(&verticalEnc, lemlib::Omniwheel::NEW_275, -2.5);
 
-// drivetrain settings
-lemlib::Drivetrain drivetrain(&leftMotors, // left motor group
-                              &rightMotors, // right motor group
-                              12.5, // 10 inch track width
-                              lemlib::Omniwheel::NEW_325, // using new 4" omnis
-                              333.33, // drivetrain rpm is 360
-                              2 // horizontal drift is 2. If we had traction wheels, it would have been 8
+// Configuracion del drivetrain 
+lemlib::Drivetrain drivetrain(&leftMotors,  // Grupo de motores izquierdo
+                              &rightMotors, // Grupo de motores derecho
+                              12.5,         // 12.5 inch track width(la distancia entre las líneas centrales de dos ruedas en el mismo eje en pulgadas)
+                              lemlib::Omniwheel::NEW_325, // rueda omni de 3,25
+                              333.33,       // drivetrain rpm is 333.33
+                              2             // la deriva horizontal es 2. Si tuviéramos ruedas de tracción, habría sido 8
 );
 
-// lateral motion controller
-lemlib::ControllerSettings linearController(10, // proportional gain (kP)
-                                            0, // integral gain (kI)
-                                            3, // derivative gain (kD)
-                                            3, // anti windup
-                                            1, // small error range, in inches
-                                            100, // small error range timeout, in milliseconds
-                                            3, // large error range, in inches
-                                            500, // large error range timeout, in milliseconds
-                                            60 // maximum acceleration (slew)
+// controlador de movimiento lateral
+lemlib::ControllerSettings linearController(10,     // ganancia proporcional (kP)
+                                            0,      // ganancia integral (kI)
+                                            3,      // ganancia integral (kI)
+                                            3,      // anti windup
+                                            1,      // rango de error pequeño, en pulgadas
+                                            100,    // tiempo de espera para rango de error pequeño, en milisegundos
+                                            3,      // rango de error grande, en pulgadas
+                                            500,    // tiempo de espera para rango de error grande, en milisegundos
+                                            60      // aceleración máxima (giro)
 );
 
-// angular motion controller
-lemlib::ControllerSettings angularController(2, // proportional gain (kP)
-                                             0, // integral gain (kI)
-                                             10, // derivative gain (kD)
-                                             3, // anti windup
-                                             1, // small error range, in degrees
-                                             100, // small error range timeout, in milliseconds
-                                             3, // large error range, in degrees
-                                             500, // large error range timeout, in milliseconds
-                                             0 // maximum acceleration (slew)
+// Controlador de movimiento angular
+lemlib::ControllerSettings angularController(2,     // ganancia proporcional (kP)
+                                             0,     // ganancia integral (kI)
+                                             10,    // ganancia integral (kI)
+                                             3,     // anti windup
+                                             1,     // rango de error pequeño, en grados
+                                             100,   // tiempo de espera para rango de error pequeño, en milisegundos
+                                             3,     // rango de error grande, en grados
+                                             500,   // tiempo de espera para rango de error grande, en milisegundos
+                                             0      // aceleración máxima (giro)
 );
 
-// sensors for odometry
+// sensores para la odometria
 lemlib::OdomSensors sensors(nullptr, // vertical tracking wheel
-                            nullptr, // vertical tracking wheel 2, set to nullptr as we don't have a second one
+                            nullptr, // vertical tracking wheel 2, Establecida en nullptr ya que no tenemos una segunda
                             nullptr, // horizontal tracking wheel
-                            nullptr, // horizontal tracking wheel 2, set to nullptr as we don't have a second one
-                            &imu // inertial sensor
+                            nullptr, // horizontal tracking wheel 2, Establecida en nullptr ya que no tenemos una segunda
+                            &imu    // Sensor inercial
 );
 
-// input curve for throttle input during driver control
-lemlib::ExpoDriveCurve throttleCurve(1, // joystick deadband out of 127
-                                     2, // minimum output where drivetrain will move out of 127
-                                     1 // expo curve gain
+// curva de entrada para la entrada del acelerador durante el control del conductor
+lemlib::ExpoDriveCurve throttleCurve(1, // Banda muerta del joystick de 127
+                                     2, // salida mínima donde la transmisión se moverá fuera de 127
+                                     1 // ganancia de la curva
 );
 
-// input curve for steer input during driver control
-lemlib::ExpoDriveCurve steerCurve(1, // joystick deadband out of 127
-                                  2, // minimum output where drivetrain will move out of 127
-                                  1 // expo curve gain
+// curva de entrada para la entrada de dirección durante el control del conductor
+lemlib::ExpoDriveCurve steerCurve(1, // Banda muerta del joystick de 127
+                                  2, // salida mínima donde la transmisión se moverá fuera de 127
+                                  1 // ganancia de la curva
 );
 
-// create the chassis
+// creamios el chassis
 lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors, &throttleCurve, &steerCurve);
 
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
+/*
+*   Ejecuta el código de inicialización. Esto ocurre en cuanto se inicia el programa.
+*   Todos los demás modos de competición están bloqueados por la inicialización; se recomienda
+*   mantener el tiempo de ejecución de este modo por debajo de unos pocos segundos.
+*/
 void initialize() {
-    pros::lcd::initialize(); // initialize brain screen
+    pros::lcd::initialize(); // Inicia la pantalladel cerebro
 
-    imu.reset(); // iniciar calibración del IMU
+    imu.reset(); // inicia la calibración del IMU
     pros::lcd::print(0, "Calibrando IMU...");
 
     // Esperar hasta que termine de calibrarse (tarda unos segundos)
@@ -106,7 +109,7 @@ void initialize() {
 
     pros::lcd::print(1, "IMU calibrado!");
 
-    chassis.calibrate(); // calibrate sensors
+    chassis.calibrate(); // Calibra sensores
     piston.set_value(false);
 
     // the default rate is 50. however, if you need to change the rate, you
@@ -117,16 +120,16 @@ void initialize() {
     // for more information on how the formatting for the loggers
     // works, refer to the fmtlib docs
 
-    // thread to for brain screen and position logging
+    // thread para mostrar información en la pantalla del controlador principal y guardar datos de posición.
     pros::Task screenTask([&]() {
         while (true) {
-            // print robot location to the brain screen
+            // imprime la ubicación del robot en la pantalla del cerebro
             pros::lcd::print(2, "X: %f", chassis.getPose().x); // x
             pros::lcd::print(3, "Y: %f", chassis.getPose().y); // y
             pros::lcd::print(4, "Theta: %f", chassis.getPose().theta); // heading
-            // log position telemetry
+            // telemetría de posición del registro
             lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
-            // delay to save resources
+            // delay para ahorrar recursos
             pros::delay(50);
         }
     });
@@ -144,6 +147,7 @@ void competition_initialize() {}
 
 // get a path used for pure pursuit
 // this needs to be put outside a function
+
 ASSET(pathrue_txt); // '.' replaced with "_" to make c++ happy
 ASSET(path22_txt); // '.' replaced with "_" to make c++ happy
 
@@ -154,42 +158,9 @@ ASSET(path22_txt); // '.' replaced with "_" to make c++ happy
  *
  * This is an example autonomous routine which demonstrates a lot of the features LemLib has to offer
  */
-/*
-void autonomous() {
-    chassis.setPose(0, 0, 0);
-
-    // Move to x: 20 and y: 15, and face heading 90. Timeout set to 4000 ms
-    chassis.moveToPose(40, 0, 90, 4000);
-    // Move to x: 0 and y: 0 and face heading 270, going backwards. Timeout set to 4000ms
-    chassis.moveToPose(0, 0, 270, 4000, {.forwards = false});
-    // cancel the movement after it has traveled 10 inches
-    chassis.waitUntil(10);
-    chassis.cancelMotion();
-    // Turn to face the point x:45, y:-45. Timeout set to 1000
-    // dont turn faster than 60 (out of a maximum of 127)
-    //chassis.turnToPoint(45, -45, 1000, {.maxSpeed = 60});
-    // Turn to face a direction of 90º. Timeout set to 1000
-    // will always be faster than 100 (out of a maximum of 127)
-    // also force it to turn clockwise, the long way around
-    //chassis.turnToHeading(90, 1000, {.direction = AngularDirection::CW_CLOCKWISE, .minSpeed = 100});
-    // Follow the path in path.txt. Lookahead at 15, Timeout set to 4000
-    // following the path with the back of the robot (forwards = false)
-    // see line 116 to see how to define a path
-    //chassis.follow(example_txt, 15, 4000, false);
-    // wait until the chassis has traveled 10 inches. Otherwise the code directly after
-    // the movement will run immediately
-    // Unless its another movement, in which case it will wait
-    //chassis.waitUntil(10);
-    //pros::lcd::print(4, "Traveled 10 inches during pure pursuit!");
-    // wait until the movement is done
-    //chassis.waitUntilDone();
-    //pros::lcd::print(4, "pure pursuit finished!");
-}
-*/    
-
 
 void autonomous() {
-    pros::lcd::print(3, "Starting autonomous...");
+    pros::lcd::print(3, "Empezando autonomo...");
 
     chassis.setPose(63.74, 23.129, 270);
 
@@ -210,24 +181,24 @@ void autonomous() {
 
 void opcontrol() {
     bool pistonState = false;
-    // controller
-    // loop to continuously update motors
+    // Control
+    // bucle para actualizar continuamente los motores
     while (true) {
-        // get joystick positions
+        // obtener posiciones del joystick
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
-        // move the robot
+        // Mover el robot en modo tanque
         chassis.tank(leftY, rightY);
 
 
-        // Control de los rollers
+        // Control del brazo
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            rollers.move(127); // girar rollers hacia adelante
+            arm.move(127); // girar arm hacia adelante
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-            rollers.move(-127); // girar rollers hacia atrás
+            arm.move(-127); // girar arm hacia atrás
         } else {
-            rollers.brake(); // detener rollers si no se presiona nada
+            arm.brake(); // detener arm si no se presiona nada
         }
             // Control del pistón
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
@@ -236,15 +207,15 @@ void opcontrol() {
             piston.set_value(false); // retraer 
         }
 
-            // Control del motor suelto
+            // Control del rodillo
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-            motor.move(127);
+            roller.move(127);
         } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-            motor.move(-127);
+            roller.move(-127);
         } else {
-            motor.brake();
+            roller.brake();
         }
-        // delay to save resources  
+        // delay para ahorrar recursos
         pros::delay(25);
     }
 }
