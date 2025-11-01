@@ -5,21 +5,30 @@
 // Control
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
+std::string formatDecimal(double value) {
+    std::ostringstream stream;
+    stream.precision(2);     // 2 decimales
+    stream << std::fixed << value;
+    return stream.str();
+}
+
 // Grupo de motores chassis
-pros::MotorGroup leftMotors({-11, -14},pros::MotorGearset::green); // Grupo de motores izquierdo - puerto 11 (reversa), 14(reversa)
-pros::MotorGroup rightMotors({12, 13}, pros::MotorGearset::green); // Grupo de motores derecgos - puerto 12 y 13
+pros::MotorGroup leftMotors({-13, -14},pros::MotorGearset::green); // Grupo de motores izquierdo - puerto 11 (reversa), 14(reversa)
+pros::MotorGroup rightMotors({11, 12}, pros::MotorGearset::green); // Grupo de motores derecgos - puerto 12 y 13
 
+// Motores para los rollers
+pros::Motor intake(-2, pros::MotorGearset::green); //  puerto 15
+pros::Motor roller(9, pros::MotorGearset::green); //  puerto 16
+// pros::Motor roller3(-1, pros::MotorGearset::green); //  puerto 17
 
-pros::MotorGroup arm ({9,10}, pros::MotorGearset::red); // Grupo de motores para el brazo puerto 9 y 10
-
-pros::Motor roller(15, pros::MotorGearset::green); // Ruedas de gomas puerto 15
-
-pros::adi::DigitalOut piston('C');   // Piston puerto "C"
-
-pros::adi::DigitalIn limit('F');    // Limit switch puerto "F"
+pros::adi::DigitalOut piston1('A');   // Piston puerto "C"
+pros::adi::DigitalOut piston2('B');   // Piston puerto "C"
+pros::adi::DigitalOut piston3('C');   // Piston puerto "C"
 
 //Sensor inercial
-pros::Imu imu(18);  //Puerto 18
+pros::Imu imu(17);  //Puerto 18
+
+
 
 
 // Esto no usamos por el momento pero es para usar los tracking wheels
@@ -40,14 +49,14 @@ lemlib::Drivetrain drivetrain(&leftMotors,  // Grupo de motores izquierdo
                               &rightMotors, // Grupo de motores derecho
                               12.5,         // 12.5 inch track width(la distancia entre las líneas centrales de dos ruedas en el mismo eje en pulgadas)
                               lemlib::Omniwheel::NEW_325, // rueda omni de 3,25
-                              333.33,       // drivetrain rpm is 333.33
+                              466.66,       // drivetrain rpm is 333.33
                               2             // la deriva horizontal es 2. Si tuviéramos ruedas de tracción, habría sido 8
 );
 
-// controlador de movimiento lateral
+// controlador de movimiento lineal
 lemlib::ControllerSettings linearController(10,     // ganancia proporcional (kP)
                                             0,      // ganancia integral (kI)
-                                            3,      // ganancia integral (kI)
+                                            3,      // ganancia derivativa (kD)
                                             3,      // anti windup
                                             1,      // rango de error pequeño, en pulgadas
                                             100,    // tiempo de espera para rango de error pequeño, en milisegundos
@@ -57,9 +66,9 @@ lemlib::ControllerSettings linearController(10,     // ganancia proporcional (kP
 );
 
 // Controlador de movimiento angular
-lemlib::ControllerSettings angularController(2,     // ganancia proporcional (kP)
+lemlib::ControllerSettings angularController(4,     // ganancia proporcional (kP)
                                              0,     // ganancia integral (kI)
-                                             10,    // ganancia integral (kI)
+                                             40,    // ganancia integral (kI)
                                              3,     // anti windup
                                              1,     // rango de error pequeño, en grados
                                              100,   // tiempo de espera para rango de error pequeño, en milisegundos
@@ -101,7 +110,8 @@ void initialize() {
 
     imu.reset(); // inicia la calibración del IMU
     pros::lcd::print(0, "Calibrando IMU...");
-
+    chassis.calibrate(); // Calibra sensores
+    
     // Esperar hasta que termine de calibrarse (tarda unos segundos)
     while (imu.is_calibrating()) {
         pros::delay(100); // esperar un poco para no saturar la CPU
@@ -109,8 +119,9 @@ void initialize() {
 
     pros::lcd::print(1, "IMU calibrado!");
 
-    chassis.calibrate(); // Calibra sensores
-    piston.set_value(false);
+    piston1.set_value(false);
+    piston2.set_value(false);
+    piston3.set_value(false);
 
     // the default rate is 50. however, if you need to change the rate, you
     // can do the following.
@@ -148,8 +159,27 @@ void competition_initialize() {}
 // get a path used for pure pursuit
 // this needs to be put outside a function
 
-ASSET(pathrue_txt); // '.' replaced with "_" to make c++ happy
-ASSET(path22_txt); // '.' replaced with "_" to make c++ happy
+ASSET(path1_txt); // '.' replaced with "_" to make c++ happy
+ASSET(chicoskills_txt); // '.' replaced with "_" to make c++ happy
+
+void move_roller (int number) {
+    intake.move(number);
+    roller.move(number);
+    //roller3.move(127);
+}
+
+void No_move_roller () {
+    intake.move(0);
+    roller.move(0);
+    //roller3.move(0);
+}
+
+
+void robot_move (int number) {
+    leftMotors.move(number);
+    rightMotors.move(number);
+}
+
 
 
 
@@ -160,27 +190,79 @@ ASSET(path22_txt); // '.' replaced with "_" to make c++ happy
  */
 
 void autonomous() {
-    pros::lcd::print(3, "Empezando autonomo...");
+    chassis.setPose(-46.403, 5.138, 0);
+    chassis.moveToPoint(-46.40, 45.7, 2000, {.maxSpeed = 70} , false);
+    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
+    piston2.set_value(true);
+    move_roller(127);
+    chassis.moveToPoint(-59, 45.7, 3000, {} , false);
+    pros::delay(1500);
+    No_move_roller();
+    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
+    piston2.set_value(false);
 
-    chassis.setPose(63.74, 23.129, 270);
+    chassis.turnToHeading(135, 1000, {.maxSpeed = 60}, false);
+    chassis.moveToPoint(-11.83, 10.52, 3000, {.maxSpeed = 70} , false);
+    piston3.set_value(true);
+    move_roller(127);
+    pros::delay(3000);
+    No_move_roller();
 
-    
-    // Seguir el path generado en path_jerryioo.txt con lookahead 15 y timeout 4000ms
-    chassis.follow(path22_txt, 15, 30000, true);
+}
 
-    // Esperar hasta que haya recorrido 10 pulgadas del path
-   // chassis.waitUntil(10);
-   // pros::lcd::print(4, "Recorrió 10 pulgadas!");
+void autonomous2() {
+    chassis.setPose(-46.403, 5.138, 0);
+    chassis.moveToPoint(-46.40, 45.7, 2000, {.maxSpeed = 70} , false);
+    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
+    piston2.set_value(true);
+    move_roller(127);
+    chassis.moveToPoint(-61, 45.7, 3000, {} , false);
+    pros::delay(2100);
+    No_move_roller();
+    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
+    piston2.set_value(false);
 
-    // Esperar hasta que termine todo el movimiento
-    //chassis.waitUntilDone();
-    //pros::lcd::print(5, "Ruta terminada!");
 
-    //pros::delay(150);
+    chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
+    move_roller(-127);
+    pros::delay(850);
+    No_move_roller();
+    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
+    piston2.set_value(true);
+    chassis.moveToPoint(-59, 45.7, 3000, {} , false);
+    move_roller(127);
+    pros::delay(2100);
+    No_move_roller();
+    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
+    piston2.set_value(false);
+
+    chassis.turnToHeading(135, 1000, {.maxSpeed = 60}, false);
+    piston3.set_value(true);
+    chassis.moveToPose(-10.3, 8.6, -225, 3000, {.maxSpeed = 70} , false);
+    move_roller(127);
+    pros::delay(3000);
+    No_move_roller();
+    piston3.set_value(false);
+
+
+
+
+    // chassis.turnToHeading(90, 1000, {.maxSpeed = 60}, false);
+    // piston1.set_value(true);
+    // piston3.set_value(true);
+    // chassis.moveToPoint(-29.8, 45.7, 2000,{}, false);
+    // move_roller(127);
+    // pros::delay(4000);
+
+
 }
 
 void opcontrol() {
-    bool pistonState = false;
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST); 
+
+    bool estadoPiston1 = false;
+    bool estadoPiston2 = false;
+    bool estadoPiston3 = false;
     // Control
     // bucle para actualizar continuamente los motores
     while (true) {
@@ -188,33 +270,80 @@ void opcontrol() {
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightY = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y);
 
+        leftMotors.move(leftY);
+        rightMotors.move(rightY);
         // Mover el robot en modo tanque
-        chassis.tank(leftY, rightY);
+        //chassis.tank(leftY, rightY);
 
+        lemlib::Pose pose = chassis.getPose();
+        std::string xStr = "X:" + formatDecimal(pose.x);
+        std::string yStr = " Y:" + formatDecimal(pose.y);
 
-        // Control del brazo
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            arm.move(127); // girar arm hacia adelante
-        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-            arm.move(-127); // girar arm hacia atrás
-        } else {
-            arm.brake(); // detener arm si no se presiona nada
-        }
-            // Control del pistón
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
-            piston.set_value(true); // extender
-        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
-            piston.set_value(false); // retraer 
-        }
+        controller.set_text(0, 0, xStr + yStr);
 
-            // Control del rodillo
+        // Gira los rollers todos hacia adelante
         if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+            intake.move(127);
             roller.move(127);
-        } else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-            roller.move(-127);
-        } else {
-            roller.brake();
+            //roller3.move(127);
         }
+        // Gira los rollers todos hacia atras
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+            intake.move(-127);
+            roller.move(-127);
+            //roller3.move(-127);
+        }
+        // Solo dos motores hacia adelante
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+            intake.move(127);
+            roller.brake();
+            // roller.move(127);
+            //roller3.brake();
+        }
+        // Solo un motor hacia adelante
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+            intake.move(-127);
+            roller.brake();
+            //roller3.brake();
+        }
+        // Frenar todos
+        else {
+            intake.brake();
+            roller.brake();
+            //roller3.brake();
+        }
+
+        
+            // Control del pistón
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+        estadoPiston1 = !estadoPiston1;         // Cambia de true a false
+        piston1.set_value(estadoPiston1);
+        }
+
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+        estadoPiston2 = !estadoPiston2;
+        piston2.set_value(estadoPiston2);
+        }
+
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+        estadoPiston3 = !estadoPiston3;
+        piston3.set_value(estadoPiston3);
+        }
+
+        if (controller.get_digital_new_press(DIGITAL_DOWN)) {
+            chassis.setPose(-46.403, 5.138, 0);
+        }
+
+        if (controller.get_digital_new_press(DIGITAL_B)) {
+
+            autonomous2();
+
+        }
+        // if (controller.get_digital_new_press(DIGITAL_X)) {
+        //     chassis.moveToPoint(0, 12, 2000); // moverse 12" adelante
+        // }
+
+
         // delay para ahorrar recursos
         pros::delay(25);
     }
