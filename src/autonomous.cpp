@@ -12,13 +12,13 @@
 // ---------------------- AUTONOMO 1 ----------------------
 void autonomous1() {
     chassis.setPose(-46.403, 5.138, 0);
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.maxSpeed = 70} , false);
+    chassis.moveToPoint(-46.40, 46.7, 2000, {.maxSpeed = 90, .minSpeed = 70} , false);
+    piston2Loader.set_value(true);
     chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
 
-    piston2Loader.set_value(true);
     move_roller(127);
 
-    chassis.moveToPoint(-59, 45.7, 3000, {} , false);
+    chassis.moveToPoint(-60.5, 45.7, 3000, {.maxSpeed = 90, .minSpeed = 70} , false);
     pros::delay(1500);
 
     No_move_roller();
@@ -131,24 +131,38 @@ void autonomous3() {
 
     //-------------------------------------------------
     // Movimiento hacia el primer roller
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.maxSpeed = 70}, false);
-    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
-
+    chassis.moveToPoint(-46.40, 45.4, 3500, {.maxSpeed = 70}, false);
     piston2Loader.set_value(true);
+
+    chassis.turnToHeading(270, 1200, {.maxSpeed = 80, .minSpeed = 40}, false);
+
     move_roller(127);
 
-    chassis.moveToPoint(-61, 45.7, 3000, {}, false);
-    pros::delay(2100);
+    chassis.moveToPose(-65, 45.4, 270, 3000, {.maxSpeed = 80, .minSpeed = 60}, false);
+    robot_move(70);
+    pros::delay(2200);
 
+    robot_move(0);
     No_move_roller();
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false}, false);
+    chassis.moveToPoint(-46.40, 45.4, 2000, {.forwards = false}, false);
     piston2Loader.set_value(false);
 
     // Roller inverso
     chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
     move_roller(-127);
-    pros::delay(850);
+    pros::delay(750);
     No_move_roller();
+
+    chassis.turnToHeading(270, 1200, {.maxSpeed = 80, .minSpeed = 40}, false);
+    piston2Loader.set_value(true);
+    chassis.moveToPose(-65, 45.4, 270, 3000, {.maxSpeed = 80, .minSpeed = 60}, false);
+    robot_move(70);
+
+    pros::delay(1500);
+    robot_move(0);
+
+    chassis.moveToPoint(-46.40, 45.4, 2000, {.forwards = false}, false);
+
 
     // Movimiento hacia goal / intake largo
     chassis.turnToHeading(135, 1500, {.maxSpeed = 60}, false);
@@ -160,6 +174,137 @@ void autonomous3() {
     pros::delay(3000);
     No_move_roller();
     piston3Puerta.set_value(false);
+}
+
+void autonomous5() {
+    // Establece la posición inicial del robot en el campo
+    // (coordenadas X = -46.403, Y = 5.138, orientación = 0°)
+    chassis.setPose(-51.43, 15, 0);
+
+    // Configura el freno de los motores en modo “COAST”
+    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
+
+    //-------------------------------------------------
+    // Movimiento hacia el primer roller
+    chassis.moveToPose(-51.43, 47.6, 0, 3500, {.maxSpeed = 70, .minSpeed = 50}, false);
+    piston2Loader.set_value(true);
+
+    chassis.turnToHeading(270, 1200, {.maxSpeed = 55, .minSpeed = 40}, false);
+    pros::delay(200);
+
+    move_roller(127);
+
+    int loaderY = chassis.getPose().y;
+
+for (int i = 0; i < 2; i++) {
+    chassis.turnToHeading(270, 1200, {.maxSpeed = 55, .minSpeed = 40}, false);
+    chassis.moveToPose(-66.5, loaderY, 270, 2000, {.maxSpeed = 100, .minSpeed = 80}, false);
+    pros::delay(100);
+}
+
+    pros::delay(1500);
+
+    No_move_roller();
+    chassis.moveToPoint(-46.40, chassis.getPose().y, 2000, {.forwards = false}, false);
+    piston2Loader.set_value(false);
+    pros::delay(200);
+
+    // Roller inverso
+    chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
+    move_roller(-127);
+    pros::delay(1100);
+    No_move_roller();
+
+    chassis.turnToHeading(270, 1200, {.maxSpeed = 80, .minSpeed = 40}, false);
+    piston2Loader.set_value(true);
+    move_roller(127);
+    for (int i = 0; i < 2; i++) {
+    chassis.turnToHeading(270, 1200, {.maxSpeed = 55, .minSpeed = 40}, false);
+    chassis.moveToPose(-66.5, loaderY, 270, 2000, {.maxSpeed = 100, .minSpeed = 80}, false);
+    pros::delay(100);
+}
+    pros::delay(2000);
+    No_move_roller();
+
+
+    chassis.moveToPoint(-46.40, chassis.getPose().y, 2000, {.forwards = false}, false);
+    piston2Loader.set_value(false);
+
+
+
+    // Movimiento hacia goal / intake largo
+    chassis.turnToHeading(135, 1500, {.maxSpeed = 60}, false);
+    piston3Puerta.set_value(true);
+    intake.move(100);
+
+    chassis.moveToPose(-10.5, 7.63, -225, 3000, {.maxSpeed = 90}, false);
+    move_roller(90);
+    pros::delay(4500);
+    No_move_roller();
+    piston3Puerta.set_value(false);
+}
+
+void winPoint() {
+    //Avanza al center
+    chassis.setPose(-52.334, 17.724, 90);
+    chassis.moveToPoint(-17.63, 17.65, 3000, {.maxSpeed = 40}, false);
+    chassis.moveToPose(-10.75, 14.5, 139.6, 3000, {.maxSpeed = 60}, false);
+    pros::delay(100);
+    piston3Puerta.set_value(true);
+    pros::delay(100);
+    move_roller(90);
+    pros::delay(2000);
+    No_move_roller();
+
+    //Se posiciona para el loader
+    
+    chassis.moveToPose(-49.86, 48.1, 137, 3000, {.forwards = false,.maxSpeed = 80}, false);
+    piston3Puerta.set_value(false);
+    piston2Loader.set_value(true);
+    chassis.turnToHeading(270, 1500, {.maxSpeed = 60}, false);
+    int loaderY = chassis.getPose().y;
+    move_roller(90);
+    // // for (int i = 0; i < 3; i++) {
+    // // chassis.moveToPose(-60.52, loaderY, 270, 1000, {.minSpeed = 60}, false);
+    // // pros::delay(1000);
+    // // }
+    robot_move(50);
+    pros::delay(800);
+    robot_move(2);
+    pros::delay(3000);
+    No_move_roller();
+    piston2Loader.set_value(false);
+    pros::delay(200);
+    chassis.moveToPose(-40.61, 46.47, 270, 1500, {.forwards = false,.maxSpeed = 60}, false);
+    chassis.turnToHeading(315, 1500, {.maxSpeed = 60}, false);
+
+    pros::delay(100);
+    move_roller(-90);
+    pros::delay(1100);
+    No_move_roller();
+
+    //Se posiciona al long
+    chassis.turnToHeading(90, 1500, {.maxSpeed = 60}, false);
+    piston1Brazo.set_value(true);
+    chassis.moveToPose(-25, 48.9, 90, 2100, {.maxSpeed = 40}, false);
+    piston3Puerta.set_value(true);
+    pros::delay(200);
+    intake.move(127);
+    roller.move(127);
+    pros::delay(3000);
+    No_move_roller();
+    chassis.setPose(-25, 48.9, 90);
+    chassis.moveToPose(-30, 48.9, 90, 3000, {.maxSpeed = 40}, false);
+    chassis.turnToHeading(60, 1500, {.maxSpeed = 60}, false);
+    chassis.moveToPose(-60, 25, 10, 3000, {.forwards = false,.maxSpeed = 60}, false);
+    piston1Brazo.set_value(false);
+    piston3Puerta.set_value(false);
+    robot_move(-70);
+    pros::delay(150);
+
+    correccionMach();
+    
+
 }
 
 // ---------------------- SKILLS 2 ----------------------

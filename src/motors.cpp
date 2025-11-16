@@ -16,7 +16,7 @@ pros::adi::DigitalOut piston3Puerta('F');
 // Funciones
 void move_roller(int number){
     intake.move(number);
-    roller.move(number);
+    roller.move(number*0.7);
 }
 
 void No_move_roller(){

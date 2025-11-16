@@ -52,13 +52,22 @@ void opcontrol1() {
             roller.move(127);
             piston3Puerta.set_value(true);
         }
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+            intake.move(90);
+            roller.move(127);
+            piston3Puerta.set_value(true); 
+        }
+        else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
+            intake.move(-80);
+            roller.move(-60); 
+        }
         else {
             intake.brake();
             roller.brake();
         }
 
         // ------------- Control de pistones -------------
-        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+        if (controller.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) {
             estadoPiston1 = !estadoPiston1;
             piston1Brazo.set_value(estadoPiston1);
         }
@@ -75,10 +84,14 @@ void opcontrol1() {
 
         // ------------- Ejecutar autónomos desde el control -------------
         if (controller.get_digital_new_press(DIGITAL_DOWN)) {
-            autonomous3();
+            winPoint();
+        }
+        
+        if (controller.get_digital_new_press(DIGITAL_UP)) {
+            chassis.setPose(-52.334, 17.724, 90);
         }
 
-        if (controller.get_digital_new_press(DIGITAL_B)) {
+        if (controller.get_digital_new_press(DIGITAL_LEFT)) {
             skills();
         }
 
