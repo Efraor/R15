@@ -9,6 +9,7 @@
 // ASSET(path1_txt);
 // ASSET(chicoskills_txt);
 
+
 // ---------------------- AUTONOMO 1 ----------------------
 void autonomous1() {
     chassis.setPose(-46.403, 5.138, 0);
