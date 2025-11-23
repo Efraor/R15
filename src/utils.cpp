@@ -14,7 +14,7 @@ std::string formatDecimal(double value){
 // Corrección del parking
 void correccion() {
     double targetHeading = 180.0;
-    int duration = 1150;
+    int duration = 1230;
     int startTime = pros::millis();
 
     while (pros::millis() - startTime < duration) {
@@ -35,7 +35,7 @@ void correccion() {
 
 void correccionMach() {
     double targetHeading = 0;
-    int duration = 1200;
+    int duration = 1250;
     int startTime = pros::millis();
 
     while (pros::millis() - startTime < duration) {
@@ -43,8 +43,8 @@ void correccionMach() {
         if (currentHeading < 0) currentHeading += 360.0;
 
         if (currentHeading >= 160 || currentHeading <= 200) {
-            robot_move(-80);
-            if (chassis.getPose().y == 1) {
+            robot_move(-70);
+            if (chassis.getPose().y == 1.5) {
                 robot_move(0); 
             }
         } else {

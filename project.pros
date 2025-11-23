@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "15pul",
+    "project_name": "Match",
     "target": "v5",
     "templates": {
       "LemLib": {
@@ -637,7 +637,7 @@
     "upload_options": {
       "description": "op",
       "icon": "ufo",
-      "slot": 2
+      "slot": 1
     },
     "use_early_access": false
   }
