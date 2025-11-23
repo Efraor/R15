@@ -5,307 +5,58 @@
 #include "lemlib/api.hpp"
 #include "pros/apix.h"
 
-// Si en algún momento usas paths de LemLib, puedes declarar tus assets aquí:
-// ASSET(path1_txt);
-// ASSET(chicoskills_txt);
 
+ASSET(skills1_txt);
+ASSET(skills2_txt);
+ASSET(skills3_txt);
+ASSET(skills4_txt);
+ASSET(skills5_txt);
+ASSET(PARKING_txt);
 
-// ---------------------- AUTONOMO 1 ----------------------
-void autonomous1() {
-    chassis.setPose(-46.403, 5.138, 0);
-    chassis.moveToPoint(-46.40, 46.7, 2000, {.maxSpeed = 90, .minSpeed = 70} , false);
-    piston2Loader.set_value(true);
-    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
+void winpoint2(){
+    //Empieza
+    chassis.setPose(-52.5, 17.11, 0);
 
-    move_roller(127);
-
-    chassis.moveToPoint(-60.5, 45.7, 3000, {.maxSpeed = 90, .minSpeed = 70} , false);
-    pros::delay(1500);
-
-    No_move_roller();
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
+    //Se mueve al loader
+    chassis.moveToPose(-52.5, 47.85, 0, 3000, {.maxSpeed = 70}, false);
     piston2Loader.set_value(false);
-
-    chassis.turnToHeading(135, 1000, {.maxSpeed = 60}, false);
-    chassis.moveToPoint(-11.83, 10.52, 3000, {.maxSpeed = 70} , false);
-
-    piston3Puerta.set_value(true);
-    move_roller(127);
-    pros::delay(3000);
-    No_move_roller();
-}
-
-// ---------------------- AUTONOMO 2 ----------------------
-void autonomous2() {
-    chassis.setPose(-46.403, 5.138, 0);
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.maxSpeed = 70} , false);
-    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
-
-    piston2Loader.set_value(true);
-    move_roller(127);
-
-    chassis.moveToPoint(-61, 45.7, 3000, {} , false);
-    pros::delay(2100);
-
-    No_move_roller();
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
-    piston2Loader.set_value(false);
-
-    chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
-    move_roller(-127);
-    pros::delay(850);
-    No_move_roller();
-
-    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
-    piston2Loader.set_value(true);
-    chassis.moveToPoint(-59, 45.7, 3000, {} , false);
-    move_roller(127);
-    pros::delay(2100);
-    No_move_roller();
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
-    piston2Loader.set_value(false);
-
-    chassis.turnToHeading(135, 1000, {.maxSpeed = 60}, false);
-    piston3Puerta.set_value(true);
-    chassis.moveToPose(-10.3, 8.6, -225, 3000, {.maxSpeed = 70} , false);
-    move_roller(127);
-    pros::delay(3000);
-    No_move_roller();
-    piston3Puerta.set_value(false);
-}
-
-// ---------------------- AUTONOMO 4 ----------------------
-void autonomous4() {
-    // Establece la posición inicial del robot en el campo
-    // (coordenadas X = -46.403, Y = 5.138, orientación = 0°)
-    chassis.setPose(-46.403, 5.138, 0);
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-
-    //-------------------------------------------------
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.maxSpeed = 70} , false);
-    chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
-
-    piston2Loader.set_value(true);
-    move_roller(127);
-
-    chassis.moveToPoint(-60, 45.7, 3000, {} , false);
-    pros::delay(2100);
-
-    No_move_roller();
-    chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
-    piston2Loader.set_value(false);
-
-    chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
-    move_roller(-127);
-    pros::delay(850);
-    No_move_roller();
-
-    // Código comentado original:
-    // chassis.turnToHeading(270, 1000, {.maxSpeed = 60}, false);
-    // piston2Loader.set_value(true);
-    // chassis.moveToPoint(-59, 45.7, 3000, {} , false);
-    // move_roller(127);
-    // pros::delay(2100);
-    // No_move_roller();
-    // chassis.moveToPoint(-46.40, 45.7, 2000, {.forwards = false} , false);
-    // piston2Loader.set_value(false);
-
-    chassis.turnToHeading(135, 1500, {.maxSpeed = 60}, false);
-    piston3Puerta.set_value(true);
-    intake.move(100);
-
-    chassis.moveToPose(-10.3, 8.6, -225, 3000, {.maxSpeed = 90} , false);
-    move_roller(127);
-    pros::delay(3000);
-    No_move_roller();
-    piston3Puerta.set_value(false);
-}
-
-// ---------------------- AUTONOMO 3 ----------------------
-void autonomous3() {
-    // Establece la posición inicial del robot en el campo
-    // (coordenadas X = -46.403, Y = 5.138, orientación = 0°)
-    chassis.setPose(-46.403, 5.138, 0);
-
-    // Configura el freno de los motores en modo “COAST”
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-
-    //-------------------------------------------------
-    // Movimiento hacia el primer roller
-    chassis.moveToPoint(-46.40, 45.4, 3500, {.maxSpeed = 70}, false);
-    piston2Loader.set_value(true);
-
-    chassis.turnToHeading(270, 1200, {.maxSpeed = 80, .minSpeed = 40}, false);
-
-    move_roller(127);
-
-    chassis.moveToPose(-65, 45.4, 270, 3000, {.maxSpeed = 80, .minSpeed = 60}, false);
-    robot_move(70);
-    pros::delay(2200);
-
-    robot_move(0);
-    No_move_roller();
-    chassis.moveToPoint(-46.40, 45.4, 2000, {.forwards = false}, false);
-    piston2Loader.set_value(false);
-
-    // Roller inverso
-    chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
-    move_roller(-127);
-    pros::delay(750);
-    No_move_roller();
-
-    chassis.turnToHeading(270, 1200, {.maxSpeed = 80, .minSpeed = 40}, false);
-    piston2Loader.set_value(true);
-    chassis.moveToPose(-65, 45.4, 270, 3000, {.maxSpeed = 80, .minSpeed = 60}, false);
-    robot_move(70);
-
-    pros::delay(1500);
-    robot_move(0);
-
-    chassis.moveToPoint(-46.40, 45.4, 2000, {.forwards = false}, false);
-
-
-    // Movimiento hacia goal / intake largo
-    chassis.turnToHeading(135, 1500, {.maxSpeed = 60}, false);
-    piston3Puerta.set_value(true);
-    intake.move(100);
-
-    chassis.moveToPose(-10.3, 8.6, -225, 3000, {.maxSpeed = 90}, false);
-    move_roller(127);
-    pros::delay(3000);
-    No_move_roller();
-    piston3Puerta.set_value(false);
-}
-
-void autonomous5() {
-    // Establece la posición inicial del robot en el campo
-    // (coordenadas X = -46.403, Y = 5.138, orientación = 0°)
-    chassis.setPose(-51.43, 15, 0);
-
-    // Configura el freno de los motores en modo “COAST”
-    chassis.setBrakeMode(pros::E_MOTOR_BRAKE_COAST);
-
-    //-------------------------------------------------
-    // Movimiento hacia el primer roller
-    chassis.moveToPose(-51.43, 47.6, 0, 3500, {.maxSpeed = 70, .minSpeed = 50}, false);
-    piston2Loader.set_value(true);
-
-    chassis.turnToHeading(270, 1200, {.maxSpeed = 55, .minSpeed = 40}, false);
-    pros::delay(200);
-
-    move_roller(127);
-
-    int loaderY = chassis.getPose().y;
-
-for (int i = 0; i < 2; i++) {
-    chassis.turnToHeading(270, 1200, {.maxSpeed = 55, .minSpeed = 40}, false);
-    chassis.moveToPose(-66.5, loaderY, 270, 2000, {.maxSpeed = 100, .minSpeed = 80}, false);
-    pros::delay(100);
-}
-
-    pros::delay(1500);
-
-    No_move_roller();
-    chassis.moveToPoint(-46.40, chassis.getPose().y, 2000, {.forwards = false}, false);
-    piston2Loader.set_value(false);
-    pros::delay(200);
-
-    // Roller inverso
-    chassis.turnToHeading(315, 1000, {.maxSpeed = 60}, false);
-    move_roller(-127);
-    pros::delay(1100);
-    No_move_roller();
-
-    chassis.turnToHeading(270, 1200, {.maxSpeed = 80, .minSpeed = 40}, false);
-    piston2Loader.set_value(true);
-    move_roller(127);
-    for (int i = 0; i < 2; i++) {
-    chassis.turnToHeading(270, 1200, {.maxSpeed = 55, .minSpeed = 40}, false);
-    chassis.moveToPose(-66.5, loaderY, 270, 2000, {.maxSpeed = 100, .minSpeed = 80}, false);
-    pros::delay(100);
-}
-    pros::delay(2000);
-    No_move_roller();
-
-
-    chassis.moveToPoint(-46.40, chassis.getPose().y, 2000, {.forwards = false}, false);
-    piston2Loader.set_value(false);
-
-
-
-    // Movimiento hacia goal / intake largo
-    chassis.turnToHeading(135, 1500, {.maxSpeed = 60}, false);
-    piston3Puerta.set_value(true);
-    intake.move(100);
-
-    chassis.moveToPose(-10.5, 7.63, -225, 3000, {.maxSpeed = 90}, false);
-    move_roller(90);
-    pros::delay(4500);
-    No_move_roller();
-    piston3Puerta.set_value(false);
-}
-
-void winPoint() {
-    //Avanza al center
-    chassis.setPose(-52.334, 17.724, 90);
-    chassis.moveToPoint(-17.63, 17.65, 3000, {.maxSpeed = 40}, false);
-    chassis.moveToPose(-10.75, 14.5, 139.6, 3000, {.maxSpeed = 60}, false);
-    pros::delay(100);
-    piston3Puerta.set_value(true);
-    pros::delay(100);
-    move_roller(90);
-    pros::delay(2000);
-    No_move_roller();
-
-    //Se posiciona para el loader
+    chassis.turnToHeading(273.5, 1500, {.maxSpeed = 70}, false);
+    loaderLoad(2);
     
-    chassis.moveToPose(-49.86, 48.1, 137, 3000, {.forwards = false,.maxSpeed = 80}, false);
-    piston3Puerta.set_value(false);
-    piston2Loader.set_value(true);
-    chassis.turnToHeading(270, 1500, {.maxSpeed = 60}, false);
+    //SALE DEL LOADER
     int loaderY = chassis.getPose().y;
-    move_roller(90);
-    // // for (int i = 0; i < 3; i++) {
-    // // chassis.moveToPose(-60.52, loaderY, 270, 1000, {.minSpeed = 60}, false);
-    // // pros::delay(1000);
-    // // }
-    robot_move(50);
-    pros::delay(800);
-    robot_move(2);
-    pros::delay(3000);
-    No_move_roller();
-    piston2Loader.set_value(false);
-    pros::delay(200);
-    chassis.moveToPose(-40.61, 46.47, 270, 1500, {.forwards = false,.maxSpeed = 60}, false);
-    chassis.turnToHeading(315, 1500, {.maxSpeed = 60}, false);
-
-    pros::delay(100);
-    move_roller(-90);
-    pros::delay(1100);
-    No_move_roller();
-
-    //Se posiciona al long
-    chassis.turnToHeading(90, 1500, {.maxSpeed = 60}, false);
-    piston1Brazo.set_value(true);
-    chassis.moveToPose(-25, 48.9, 90, 2100, {.maxSpeed = 40}, false);
-    piston3Puerta.set_value(true);
-    pros::delay(200);
-    intake.move(127);
-    roller.move(127);
-    pros::delay(3000);
-    No_move_roller();
-    chassis.setPose(-25, 48.9, 90);
-    chassis.moveToPose(-30, 48.9, 90, 3000, {.maxSpeed = 40}, false);
-    chassis.turnToHeading(60, 1500, {.maxSpeed = 60}, false);
-    chassis.moveToPose(-60, 25, 10, 3000, {.forwards = false,.maxSpeed = 60}, false);
-    piston1Brazo.set_value(false);
-    piston3Puerta.set_value(false);
-    robot_move(-70);
-    pros::delay(150);
-
-    correccionMach();
+    chassis.moveToPoint(-51, loaderY, 3000, {.forwards = false, .maxSpeed = 70}, false);
+    chassis.moveToPoint(-51, loaderY, 3000, {.forwards = false, .maxSpeed = 80}, false);
+    piston2Loader.set_value(true);
+    chassis.turnToHeading(130, 1500, {.maxSpeed = 80}, false);
+    move_roller(80);
     
+    
+    //VA AL CENTER GOAL
+    chassis.moveToPose(-9.58, 12.66, 138, 3000, {.maxSpeed = 60}, false);
+    piston3Puerta.set_value(true);
+    move_roller(120);
+    pros::delay(1300);
+    move_roller(-60);
+    piston3Puerta.set_value(false);
+    move_roller(-60);
+    robot_move(-60);
+    pros::delay(200);
+    move_roller(0);
+    robot_move(0);
+    
+    //Se posiciona al otro
+    chassis.turnToHeading(45, 1500, {.maxSpeed = 80}, false);
+    piston3Puerta.set_value(false);
+    chassis.moveToPose(-28.06, -23.5, 0, 3000, {.forwards = false, .maxSpeed = 60}, false);
+    chassis.turnToHeading(40, 1500, {.maxSpeed = 60}, false);
+    chassis.moveToPose(-10, -8.2, 45, 1500, {.maxSpeed = 70}, false);
+    move_roller(-110);
+    pros::delay(3500);
 
+    //Se va a estacionar
+    chassis.follow(PARKING_txt,15,3000,false,false);
+    correccionMach();    
 }
 
 // ---------------------- SKILLS 2 ----------------------
@@ -363,6 +114,59 @@ void skills2 () {
     chassis.moveToPose(-54.3, -28.2, 160, 3000, {.forwards= false, .maxSpeed = 60}, false);
     chassis.moveToPose(-62.86, 0, 180, 2000, {.forwards= false, .minSpeed =127 }, false);
     correccion();
+}
+
+void skillsp() {
+    chassis.setPose(-52.334, 17.724, 90);
+    move_roller(90);
+    chassis.follow(skills1_txt, 15, 5500, true, false);
+    move_roller(0);
+    chassis.moveToPose(-1.879, 33.295, 0, 2000, {.forwards = false, .maxSpeed = 60}, false);
+    chassis.turnToHeading(45, 1200);
+    chassis.moveToPose(-22.37, 28, 139, 3000, {.forwards = false, .maxSpeed = 60}, false);
+    chassis.turnToHeading(130, 1200);
+    chassis.moveToPose(-12, 16.78, 136, 5000, {.maxSpeed = 70}, false);
+    piston3Puerta.set_value(true);
+    move_roller(127);
+    pros::delay(4000);
+    No_move_roller();
+
+    //Se posiciona para el otro lado
+    chassis.moveToPose(-22.37, 28, 120, 3000, {.forwards = false, .maxSpeed = 60}, false);
+
+    piston3Puerta.set_value(false);
+
+    //se va al otro lado
+    chassis.moveToPose(-18.24, -13.74, 142, 3000, {.maxSpeed = 80}, false);
+    chassis.moveToPose(-6.10, -19, 104, 3000, {.maxSpeed = 80}, false);
+    move_roller(120);
+    chassis.swingToHeading(148, lemlib::DriveSide::RIGHT, 2000, {.maxSpeed = 120});
+
+    //se pociciona para recoger
+    chassis.moveToPose(0, -41.4, 180, 4000, {.maxSpeed = 30}, false);
+    chassis.moveToPose(0, -35.4, 180, 4000, {.maxSpeed = 60}, false);
+    No_move_roller();
+    chassis.turnToHeading(135, 1000);
+
+    //Se posiciona para anotar
+    chassis.moveToPose(-22.11, -25.75, 135, 3000, {.forwards = false, .maxSpeed = 100}, false);
+    chassis.turnToHeading(45, 1000);
+    chassis.moveToPose(-9, -5.57, 46.1, 3000, {.maxSpeed = 50}, false);
+    move_roller(-70);
+    pros::delay(5000);
+    No_move_roller();
+
+    // Movimiento final + corrección
+    chassis.moveToPose(-54.3, -28.2, 160, 3000, {.forwards= false, .maxSpeed = 60}, false);
+    chassis.moveToPose(-62.86, 0, 180, 2000, {.forwards= false, .minSpeed =127 }, false);
+    //estacionar180(-2);
+
+
+
+    //chassis.turnToHeading(218, 1200);
+    //piston3Puerta.set_value(false);
+
+
 }
 
 // ---------------------- SKILLS (VERSIÓN COMENTADA) ----------------------

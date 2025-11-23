@@ -13,7 +13,7 @@ void competition_initialize() {}
 
 void autonomous() {
     // Cambia este número para elegir qué autónomo se usará en competencia
-    winPoint();  
+    winpoint2();  
 }
 
 void opcontrol() {

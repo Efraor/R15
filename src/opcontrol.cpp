@@ -54,7 +54,7 @@ void opcontrol1() {
         }
         else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
             intake.move(90);
-            roller.move(127);
+            roller.move(60);
             piston3Puerta.set_value(true); 
         }
         else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
@@ -84,15 +84,18 @@ void opcontrol1() {
 
         // ------------- Ejecutar autónomos desde el control -------------
         if (controller.get_digital_new_press(DIGITAL_DOWN)) {
-            winPoint();
+            winpoint2();
         }
         
+        // if (controller.get_digital_new_press(DIGITAL_UP)) {
+        //     chassis.setPose(-52.334, 17.724, 90);
+        // }
+
         if (controller.get_digital_new_press(DIGITAL_UP)) {
             chassis.setPose(-52.334, 17.724, 90);
         }
-
         if (controller.get_digital_new_press(DIGITAL_LEFT)) {
-            skills();
+            chassis.moveToPose(0, 71, 0, 30004);
         }
 
         pros::delay(25);
