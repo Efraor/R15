@@ -55,7 +55,7 @@ void winpoint2(){
     chassis.turnToHeading(40, 1500, {.maxSpeed = 60}, false);
     chassis.moveToPose(-10, -8.2, 47.5, 1500, {.maxSpeed = 70}, false);
     move_roller(-110);
-    pros::delay(6500);
+    pros::delay(8500);
 
     //Se va a estacionar
     chassis.follow(PARKING_txt,15,3000,false,false);
